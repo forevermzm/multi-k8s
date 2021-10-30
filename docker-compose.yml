@@ -1,0 +1,58 @@
+version: '3'
+services:
+  # Only need to use latest postgres image and that's all
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+  redis:
+    image: 'redis:latest'
+  nginx:
+    depends_on:
+      - api
+      - client
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - '3050:80'
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./server
+    volumes:
+      # Leave this folder alone
+      - /app/node_modules
+      # Sync my local to remote
+      - ./server:/app
+    environment:
+      # Just reference the service name
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  client:
+    stdin_open: true
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+    environment:
+      - NODE_OPTIONS=--openssl-legacy-provider
+  worker:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker-go
+    # volumes:
+    #   - /app/node_modules
+    #   - ./worker:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    
