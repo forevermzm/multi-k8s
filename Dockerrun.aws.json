@@ -20,12 +20,6 @@
             "essential": false
         },
         {
-            "name": "worker",
-            "image": "forevermzm00/multi-worker",
-            "hostname": "worker",
-            "essential": false
-        },
-        {
             "name": "nginx",
             "image": "forevermzm00/multi-nginx",
             "hostname": "nginx",
