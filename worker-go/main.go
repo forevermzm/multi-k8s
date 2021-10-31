@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"os"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -22,8 +23,11 @@ func fib(num int64) int64 {
 
 func main() {
 	fmt.Println("Starting app")
+	var redisHost = os.Getenv("REDIS_HOST")
+	var redisPort = os.Getenv("REDIS_PORT")
+	fmt.Println("Using redis at host: " + redisHost + " and port: " + redisPort)
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "redis:6379",
+		Addr:     redisHost + ":" + redisPort,
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
@@ -41,7 +45,9 @@ func main() {
 
 		fmt.Println("received", msg.Payload, "from", msg.Channel)
 		intVal, err := strconv.ParseInt(msg.Payload, 10, 0)
-		rdb.HSet(ctx, "values", msg.Payload, fib(intVal))
+		var fibValue = fib(intVal)
+		fmt.Println("Calculated fib value", fibValue)
+		rdb.HSet(ctx, "values", msg.Payload, fibValue)
 	}
 
 	// err := rdb.Set(ctx, "key", "value", 0).Err()
