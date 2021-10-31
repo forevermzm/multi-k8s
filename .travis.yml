@@ -27,7 +27,7 @@ deploy:
   app: "docker-multi-legacy"
   environment: "Dockermultilegacy-env"
   bucket_name: "elasticbeanstalk-us-west-2-719272187394"
-  bucket_path: "docker-multi"
+  bucket_path: "docker-multi-legacy"
   on:
     branch: master
   access_key_id: $AWS_ACCESS_KEY
