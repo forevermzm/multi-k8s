@@ -1,0 +1,17 @@
+sudo: required
+services: 
+  - docker
+before_install:
+  - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker build -t "$DOCKER_USERNAME"/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true "$DOCKER_USERNAME"/react-test npm test
+
+deploy:
+  provider: gae
+  keyfile: service-account.json
+  project: "multi-k8s-331201"
+  on:
+    branch: master
